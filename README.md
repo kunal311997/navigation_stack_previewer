@@ -2,6 +2,12 @@
 
 A Flutter package that provides a visual preview of your app's navigation stack. Simply swipe down from the top edge to see screenshots of your previous screens and navigate back instantly.
 
+# Screenshot 
+<img  width="300" height="700" alt="Screenshot_20260228_160114" src="https://github.com/user-attachments/assets/559b01f7-1a89-4f19-aaeb-7dcee9fdd5a6" />
+
+# Video 
+https://github.com/user-attachments/assets/19fd448d-26a3-44a2-a6a0-bdb2a2d612a4
+
 ## Features
 
 - **Visual History**: See real screenshots of previous screens in your navigation stack.

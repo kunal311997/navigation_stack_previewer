@@ -10,40 +10,42 @@ import '../utils/constants.dart';
 import 'history_panel.dart';
 
 /// A global wrapper that enables navigation stack previewing for the entire app.
-/// 
+///
 /// Place this in the `builder` property of your `MaterialApp`.
 class NavigationStackPreviewer extends StatefulWidget {
   final Widget child;
-  final double swipeThreshold;
   final double panelHeight;
-  final Duration animationDuration;
+  final Color primaryColor;
+  final Color backgroundColor;
 
   const NavigationStackPreviewer({
     super.key,
     required this.child,
-    this.swipeThreshold = AppConstants.defaultSwipeThreshold,
     this.panelHeight = AppConstants.defaultPanelHeight,
-    this.animationDuration = AppConstants.defaultAnimationDuration,
+    this.primaryColor = AppConstants.defaultPrimaryColor,
+    this.backgroundColor = Colors.white,
   });
 
   @override
-  State<NavigationStackPreviewer> createState() => _NavigationStackPreviewerState();
+  State<NavigationStackPreviewer> createState() =>
+      _NavigationStackPreviewerState();
 }
 
 class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
   final GlobalKey _globalKey = GlobalKey();
   double _dragStartPosition = 0;
   bool _isPanelOpen = false;
-  final NavigationHistoryService _navigationHistory = sl<NavigationHistoryService>();
   StreamSubscription? _captureSubscription;
+  final NavigationHistoryService _navigationService =
+      sl<NavigationHistoryService>();
 
   @override
   void initState() {
     super.initState();
-    _captureSubscription = _navigationHistory.captureRequests.listen((_) {
+    _captureSubscription = _navigationService.captureRequests.listen((_) {
       _captureScreenshot();
     });
-    
+
     // Initial capture for the home screen
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _captureScreenshot();
@@ -72,23 +74,19 @@ class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
       if (byteData == null) return;
 
       final bytes = byteData.buffer.asUint8List();
-      _navigationHistory.addScreenshot(bytes);
+      _navigationService.addScreenshot(bytes);
     } catch (e) {
       debugPrint("Error capturing screenshot: $e");
     }
   }
 
-  void _openPanel() {
-    setState(() => _isPanelOpen = true);
-  }
+  void _openPanel() => setState(() => _isPanelOpen = true);
 
-  void _closePanel() {
-    setState(() => _isPanelOpen = false);
-  }
+  void _closePanel() => setState(() => _isPanelOpen = false);
 
-  void _handleHistoryItemTap(int index) {
+  void _onTap(int index) {
     _closePanel();
-    _navigationHistory.jumpTo(index);
+    _navigationService.jumpTo(index);
   }
 
   @override
@@ -103,12 +101,11 @@ class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
               _dragStartPosition = details.localPosition.dy;
             },
             onVerticalDragUpdate: (details) {
-              if (_dragStartPosition < widget.swipeThreshold &&
+              if (_dragStartPosition < AppConstants.defaultSwipeThreshold &&
                   details.delta.dy > 5 &&
                   !_isPanelOpen) {
                 _openPanel();
-                _dragStartPosition =
-                    double.infinity; // Prevent multiple triggers
+                _dragStartPosition = double.infinity;
               }
             },
             child: widget.child,
@@ -120,15 +117,18 @@ class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
             child: Container(color: Colors.black26),
           ),
         AnimatedPositioned(
-          duration: widget.animationDuration,
+          duration: AppConstants.defaultAnimationDuration,
           curve: Curves.fastOutSlowIn,
-          top: _isPanelOpen ? 0 : -widget.panelHeight,
+          top: _isPanelOpen ? 0 : -(widget.panelHeight + 50),
           left: 0,
           right: 0,
           child: HistoryPanel(
             height: widget.panelHeight,
             onClose: _closePanel,
-            onItemTap: _handleHistoryItemTap,
+            onTap: _onTap,
+            navigationService: _navigationService,
+            primaryColor: widget.primaryColor,
+            backgroundColor: widget.backgroundColor,
           ),
         ),
       ],

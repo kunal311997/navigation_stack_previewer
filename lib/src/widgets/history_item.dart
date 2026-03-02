@@ -9,6 +9,7 @@ class HistoryItem extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onRemove;
   final bool isCurrent;
+  final Color primaryColor;
 
   const HistoryItem({
     super.key,
@@ -16,6 +17,7 @@ class HistoryItem extends StatelessWidget {
     required this.onTap,
     required this.onRemove,
     this.isCurrent = false,
+    required this.primaryColor,
   });
 
   @override
@@ -33,26 +35,22 @@ class HistoryItem extends StatelessWidget {
               aspectRatio: AppConstants.historyItemAspectRatio,
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius:
-                      BorderRadius.circular(AppConstants.historyItemBorderRadius),
+                  borderRadius: BorderRadius.circular(AppConstants.s12),
                   border: Border.all(
-                    color: isCurrent
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).dividerColor.withOpacity(0.1),
-                    width: isCurrent ? 2 : 1,
+                    color:
+                        isCurrent ? primaryColor : primaryColor.withAlpha(50),
+                    width: AppConstants.s2,
                   ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.05),
                       blurRadius: AppConstants.s4,
-                      offset: const Offset(0, 2),
+                      offset: const Offset(6.0, 6.0),
                     ),
                   ],
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(isCurrent
-                      ? AppConstants.historyItemBorderRadius - 2
-                      : AppConstants.historyItemBorderRadius - 1),
+                  borderRadius: BorderRadius.circular(AppConstants.s12),
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
@@ -66,18 +64,19 @@ class HistoryItem extends StatelessWidget {
                           left: AppConstants.s4,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
+                              horizontal: AppConstants.s8,
+                              vertical: AppConstants.s4,
                             ),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary,
-                              borderRadius: BorderRadius.circular(
-                                  AppConstants.currentLabelBorderRadius),
+                              color: primaryColor,
+                              borderRadius:
+                                  BorderRadius.circular(AppConstants.s8),
                             ),
-                            child: Text(
+                            child: const Text(
                               AppConstants.currentLabel,
                               style: TextStyle(
-                                color: Theme.of(context).colorScheme.onPrimary,
+                                decoration: TextDecoration.none,
+                                color: Colors.white,
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -92,20 +91,19 @@ class HistoryItem extends StatelessWidget {
           ),
           if (!isCurrent)
             Positioned(
-              top: 0,
-              right: 0,
+              top: AppConstants.s4,
+              right: AppConstants.s4,
               child: GestureDetector(
                 onTap: onRemove,
                 child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
+                  padding: const EdgeInsets.all(AppConstants.s4),
+                  decoration: const BoxDecoration(
+                    color: Colors.black,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 1),
                   ),
                   child: const Icon(
                     Icons.close,
-                    size: 14,
+                    size: AppConstants.s16,
                     color: Colors.white,
                   ),
                 ),

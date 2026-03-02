@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.0.2
+- Improved pub.dev score by adding comprehensive Dartdoc comments.
+- Added a full integration example in the `example/` directory.
+- Refined the `NavigationStackObserver` API for easier use.
+- Updated documentation with customization and filtering guides.
+- Added colors and panel dimensions to match your app's theme. 
+
 ## 0.0.1
 - Initial release.
 - Added visual navigation stack preview via a swipe-down panel.

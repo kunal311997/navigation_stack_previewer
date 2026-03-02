@@ -5,6 +5,6 @@ import '../services/navigation_history_service.dart';
 final sl = GetIt.instance;
 
 /// Initializes the dependency injection container.
-Future<void> init() async {
+Future<void> initNavHistory() async {
   sl.registerLazySingleton(() => NavigationHistoryService());
 }

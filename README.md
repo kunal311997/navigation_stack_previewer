@@ -2,11 +2,11 @@
 
 A Flutter package that provides a visual preview of your app's navigation stack. Simply swipe down from the top edge to see screenshots of your previous screens and navigate back instantly.
 
-# Screenshot 
-<img  width="300" height="700" alt="Screenshot_20260228_160114" src="https://github.com/user-attachments/assets/559b01f7-1a89-4f19-aaeb-7dcee9fdd5a6" />
+# Screenshot
+<img width="300" height="700" alt="Screenshot_20260302_225023" src="https://github.com/user-attachments/assets/04215ea9-724c-481b-923b-f33438d329c6" />
 
-# Video 
-https://github.com/user-attachments/assets/19fd448d-26a3-44a2-a6a0-bdb2a2d612a4
+# Video
+https://github.com/user-attachments/assets/33ed6b5d-d293-417c-a920-eeb8267d0092
 
 ## Features
 
@@ -14,7 +14,8 @@ https://github.com/user-attachments/assets/19fd448d-26a3-44a2-a6a0-bdb2a2d612a4
 - **Easy Navigation**: Tap on any screenshot to jump directly back to that screen.
 - **Auto-Detection**: Automatically detects `push`, `pushReplacement`, and `pop` operations.
 - **Global Integration**: Set it up once and it works across your entire app.
-- **Customizable**: Control swipe sensitivity, panel height, and animation durations.
+- **Customizable Appearance**: Change colors and panel dimensions to match your app's theme.
+- **Filtering**: Decide which screens to hide from the previewer.
 
 ## Getting started
 
@@ -22,21 +23,21 @@ Add the package to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  navigation_stack_previewer: ^0.0.1
+  navigation_stack_previewer: ^0.0.2
 ```
 
 ## Usage
 
 ### 1. Initialize the library
 
-Call `init()` in your `main()` function:
+Call `initNavHistory()` in your `main()` function:
 
 ```dart
 import 'package:navigation_stack_previewer/navigation_stack_previewer.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await init(); // Initialize dependencies
+  await initNavHistory(); // Initialize dependencies
   runApp(const MyApp());
 }
 ```
@@ -56,7 +57,11 @@ class MyApp extends StatelessWidget {
       ],
       // Wrap the navigator
       builder: (context, child) {
-        return NavigationStackPreviewer(child: child!);
+        return NavigationStackPreviewer(
+          primaryColor: Colors.deepPurple, // Custom primary color
+          backgroundColor: Colors.white,   // Custom background color
+          child: child!,
+        );
       },
       home: const MyHomePage(),
     );
@@ -70,6 +75,35 @@ class MyApp extends StatelessWidget {
 - **Tap** a previous screen's screenshot to navigate back to it.
 - **Tap the X** on a screenshot to remove that specific screen from the stack.
 - **Tap the current screen** or swipe up to close the panel.
+
+## Advanced Customization
+
+### Hiding Screens
+
+You can exclude specific screens from the navigation history by passing `preview: false` in `RouteSettings` arguments when navigating:
+
+```dart
+Navigator.of(context).push(
+  MaterialPageRoute(
+    builder: (_) => const SecretPage(),
+    settings: const RouteSettings(
+      arguments: {'preview': false}, // This screen won't be added to history
+    ),
+  ),
+);
+```
+
+By default, the library only tracks `PageRoute`s, so dialogs and bottom sheets are automatically excluded.
+
+### Theming Parameters
+
+The `NavigationStackPreviewer` widget accepts several optional parameters:
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `primaryColor` | `Color` | `Colors.blue` | Color used for borders, labels, and icons. |
+| `backgroundColor` | `Color` | `Colors.white` | Background color of the history panel. |
+| `panelHeight` | `double` | `200.0` | Total height of the sliding history panel. |
 
 ## Additional information
 

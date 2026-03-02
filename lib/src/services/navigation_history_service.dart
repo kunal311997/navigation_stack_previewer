@@ -1,39 +1,44 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:typed_data';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../di/injection_container.dart';
 
 /// Represents an entry in the navigation history.
 class NavigationHistoryEntry {
+  /// The screenshot of the screen.
   final Uint8List screenshot;
+
+  /// The route associated with the screen.
   final Route route;
 
+  /// Creates a new navigation history entry.
   NavigationHistoryEntry({required this.screenshot, required this.route});
 }
 
 /// A service that manages the navigation history by storing screenshots and routes.
 class NavigationHistoryService extends ChangeNotifier {
+  /// Creates a new navigation history service.
+  ///
+  /// [maxHistoryItems] is the maximum number of items to keep in the history.
+  NavigationHistoryService({this.maxHistoryItems = 10});
+
+  /// The maximum number of items to keep in the history.
   final int maxHistoryItems;
   final List<NavigationHistoryEntry> _history = [];
-  
+
+  /// Returns an unmodifiable list of screenshots in the history, newest first.
+  UnmodifiableListView<Uint8List> get history =>
+      UnmodifiableListView(_history.reversed.map((e) => e.screenshot).toList());
+
   Route? _activeRoute;
   bool _isLastOperationReplacement = false;
 
   // Stream to notify the UI to capture a screenshot
   final _captureRequestController = StreamController<void>.broadcast();
+
+  /// A stream of capture requests that the UI should listen to.
   Stream<void> get captureRequests => _captureRequestController.stream;
-
-  NavigationHistoryService({this.maxHistoryItems = 5});
-
-  /// Returns an unmodifiable list of history entries, newest first.
-  UnmodifiableListView<NavigationHistoryEntry> get historyEntries =>
-      UnmodifiableListView(_history.reversed);
-
-  /// Helper to get just the screenshots, newest first.
-  UnmodifiableListView<Uint8List> get history =>
-      UnmodifiableListView(_history.reversed.map((e) => e.screenshot).toList());
 
   /// Request a screenshot capture from the UI.
   void requestCapture() {
@@ -55,7 +60,7 @@ class NavigationHistoryService extends ChangeNotifier {
 
     // Check if we already have a screenshot for this specific route instance
     if (_history.isNotEmpty && _history.last.route == _activeRoute) {
-      return; 
+      return;
     }
 
     if (_isLastOperationReplacement && _history.isNotEmpty) {
@@ -63,12 +68,12 @@ class NavigationHistoryService extends ChangeNotifier {
     } else if (_history.length >= maxHistoryItems) {
       _history.removeAt(0);
     }
-    
+
     _history.add(NavigationHistoryEntry(
       screenshot: bytes,
       route: _activeRoute!,
     ));
-    
+
     _isLastOperationReplacement = false;
     notifyListeners();
   }
@@ -86,37 +91,17 @@ class NavigationHistoryService extends ChangeNotifier {
         navigator.pop();
       }
     }
-    
-    // The NavigationStackObserver.didPop will handle history cleanup
-  }
-
-  /// Removes the specified number of most recent history items.
-  void removeRecent(int count) {
-    for (int i = 0; i < count; i++) {
-      if (_history.isNotEmpty) {
-        _history.removeLast();
-      }
-    }
-    notifyListeners();
   }
 
   /// Removes a history item at the given index (relative to newest first list).
   /// Also attempts to remove the associated route from the navigator.
   void removeAt(int index) {
-    int actualIndex = _history.length - 1 - index;
-    if (actualIndex >= 0 && actualIndex < _history.length) {
-      final entry = _history[actualIndex];
-      
-      // If it's the current screen, we pop it. 
-      // If it's a screen below, we remove it from the stack.
-      if (index == 0) {
-        entry.route.navigator?.pop();
-      } else {
-        entry.route.navigator?.removeRoute(entry.route);
-        // Since removeRoute doesn't trigger didPop, we remove it manually
-        _history.removeAt(actualIndex);
-        notifyListeners();
-      }
+    int absoluteIndex = _history.length - 1 - index;
+    if (absoluteIndex >= 0 && absoluteIndex < _history.length) {
+      final entry = _history[absoluteIndex];
+      entry.route.navigator?.removeRoute(entry.route);
+      _history.removeAt(absoluteIndex);
+      notifyListeners();
     }
   }
 
@@ -128,6 +113,7 @@ class NavigationHistoryService extends ChangeNotifier {
     }
   }
 
+  /// Clears all items from the navigation history.
   void clear() {
     _history.clear();
     _activeRoute = null;
@@ -139,37 +125,5 @@ class NavigationHistoryService extends ChangeNotifier {
   void dispose() {
     _captureRequestController.close();
     super.dispose();
-  }
-}
-
-/// A NavigatorObserver that updates the [NavigationHistoryService] about navigation events.
-class NavigationStackObserver extends NavigatorObserver {
-  final NavigationHistoryService _service;
-
-  NavigationStackObserver([NavigationHistoryService? service]) 
-      : _service = service ?? sl<NavigationHistoryService>();
-
-  @override
-  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    super.didPush(route, previousRoute);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _service.setActiveRoute(route, isReplacement: false);
-    });
-  }
-
-  @override
-  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
-    super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
-    if (newRoute != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _service.setActiveRoute(newRoute, isReplacement: true);
-      });
-    }
-  }
-
-  @override
-  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    super.didPop(route, previousRoute);
-    _service.handleRoutePopped(route);
   }
 }

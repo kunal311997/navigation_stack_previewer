@@ -6,7 +6,7 @@ A Flutter package that provides a visual preview of your app's navigation stack.
 <img width="300" height="700" alt="Screenshot_20260302_225023" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260302_225023.png" />
 
 # Video
-https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260302_225023.png
+https://github.com/user-attachments/assets/33ed6b5d-d293-417c-a920-eeb8267d0092
 
 ## Features
 

@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.0.3
+- Simplified filtering logic by using `RouteSettings` instead of a global filter callback.
+- Updated `pubspec.yaml` with valid `repository` and `issue_tracker` links for pub.dev.
+- Updated dependencies to the latest versions.
+
 ## 0.0.2
 - Improved pub.dev score by adding comprehensive Dartdoc comments.
 - Added a full integration example in the `example/` directory.

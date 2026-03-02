@@ -32,7 +32,7 @@ class HistoryPanel extends StatelessWidget {
             color: Colors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withAlpha(40),
                 blurRadius: AppConstants.s10,
                 offset: AppConstants.boxShadowOffset,
               ),
@@ -90,7 +90,7 @@ class HistoryPanel extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withAlpha(40),
                     blurRadius: AppConstants.s10,
                     offset: AppConstants.boxShadowOffset,
                   ),

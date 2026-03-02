@@ -43,7 +43,7 @@ class HistoryItem extends StatelessWidget {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withAlpha(30),
                       blurRadius: AppConstants.s4,
                       offset: const Offset(6.0, 6.0),
                     ),

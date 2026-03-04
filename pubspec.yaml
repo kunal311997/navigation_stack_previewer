@@ -1,6 +1,6 @@
 name: navigation_stack_previewer
 description: "A visual navigation stack previewer for Flutter. Swipe down from the top to see real-time screenshots of your navigation history and navigate back instantly by tapping on them."
-version: 0.0.3
+version: 0.0.4
 repository: https://github.com/kunal311997/navigation_stack_previewer.git
 issue_tracker: https://github.com/kunal311997/navigation_stack_previewer/issues
 

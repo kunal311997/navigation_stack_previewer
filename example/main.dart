@@ -3,8 +3,10 @@ import 'package:navigation_stack_previewer/navigation_stack_previewer.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   // Initialize the navigation stack previewer dependencies
   await initNavHistory();
+
   runApp(const MyApp());
 }
 
@@ -23,10 +25,21 @@ class MyApp extends StatelessWidget {
       navigatorObservers: [
         NavigationStackObserver(),
       ],
-      // 2. Wrap the app with NavigationStackPreviewer to enable the swipe-down gesture
+      // 2. Wrap the app with NavigationStackPreviewer to enable the swipe gesture
       builder: (context, child) {
         return NavigationStackPreviewer(
-          primaryColor: Colors.deepPurple,
+          panelHeight: 400,
+          config: const StackPreviewConfig(
+            layout: StackPreviewLayout.carousel,
+            position: StackPreviewPosition.top,
+            primaryColor: Colors.deepPurple,
+            backgroundColor: Colors.white,
+            animationCurve: Curves.fastOutSlowIn,
+            animationDuration: Duration(milliseconds: 500),
+            maxRoutes: 10,
+            pixelRatio: 0.5,
+            title: 'App Navigation Stack',
+          ),
           child: child!,
         );
       },
@@ -46,12 +59,15 @@ class FirstPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Swipe down from the top to see history'),
+            const Text('Swipe up from the bottom edge to see history'),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const SecondPage()),
+                  MaterialPageRoute(
+                    builder: (_) => const SecondPage(),
+                    settings: const RouteSettings(name: '/second_page'),
+                  ),
                 );
               },
               child: const Text('Go to Second Page'),
@@ -79,7 +95,10 @@ class SecondPage extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (_) => const ThirdPage()),
+                  MaterialPageRoute(
+                    builder: (_) => const ThirdPage(),
+                    settings: const RouteSettings(name: '/third_page'),
+                  ),
                 );
               },
               child: const Text('Replace with Third Page'),
@@ -90,8 +109,10 @@ class SecondPage extends StatelessWidget {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => const SecretPage(),
-                    settings:
-                        const RouteSettings(arguments: {'preview': false}),
+                    settings: const RouteSettings(
+                      name: '/secret_page',
+                      arguments: {'preview': false},
+                    ),
                   ),
                 );
               },
@@ -112,7 +133,7 @@ class ThirdPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Third Page')),
       body: const Center(
-        child: Text('Third Page - Swipe down to see First Page in history'),
+        child: Text('Third Page - Swipe up to see history panel'),
       ),
     );
   }

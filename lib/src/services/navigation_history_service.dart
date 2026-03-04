@@ -4,35 +4,30 @@ import 'dart:collection';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-/// Represents an entry in the navigation history.
-class NavigationHistoryEntry {
-  /// The screenshot of the screen.
-  final Uint8List screenshot;
-
-  /// The route associated with the screen.
-  final Route route;
-
-  /// Creates a new navigation history entry.
-  NavigationHistoryEntry({required this.screenshot, required this.route});
-}
+import '../utils/stack_preview_config.dart';
+import 'navigation_history_entry.dart';
 
 /// A service that manages the navigation history by storing screenshots and routes.
 class NavigationHistoryService extends ChangeNotifier {
-  /// Creates a new navigation history service.
-  ///
-  /// [maxHistoryItems] is the maximum number of items to keep in the history.
-  NavigationHistoryService({this.maxHistoryItems = 10});
-
-  /// The maximum number of items to keep in the history.
-  final int maxHistoryItems;
-  final List<NavigationHistoryEntry> _history = [];
-
-  /// Returns an unmodifiable list of screenshots in the history, newest first.
-  UnmodifiableListView<Uint8List> get history =>
-      UnmodifiableListView(_history.reversed.map((e) => e.screenshot).toList());
-
   Route? _activeRoute;
   bool _isLastOperationReplacement = false;
+
+  /// The configuration for the navigation stack previewer.
+  StackPreviewConfig _config = const StackPreviewConfig();
+
+  /// Current configuration.
+  StackPreviewConfig get config => _config;
+
+  /// Update the configuration of the service.
+  void updateConfig(StackPreviewConfig config) {
+    _config = config;
+  }
+
+  final List<NavigationHistoryEntry> _history = [];
+
+  /// Returns an unmodifiable list of history entries, newest first.
+  UnmodifiableListView<NavigationHistoryEntry> get historyEntries =>
+      UnmodifiableListView(_history.reversed);
 
   // Stream to notify the UI to capture a screenshot
   final _captureRequestController = StreamController<void>.broadcast();
@@ -56,22 +51,23 @@ class NavigationHistoryService extends ChangeNotifier {
 
   /// Adds a new screenshot to the history, associated with the current active route.
   void addScreenshot(Uint8List bytes) {
-    if (_activeRoute == null) return;
+    final route = _activeRoute;
+    if (route == null) return;
 
     // Check if we already have a screenshot for this specific route instance
-    if (_history.isNotEmpty && _history.last.route == _activeRoute) {
+    if (_history.isNotEmpty && _history.last.route == route) {
       return;
     }
 
     if (_isLastOperationReplacement && _history.isNotEmpty) {
       _history.removeLast();
-    } else if (_history.length >= maxHistoryItems) {
+    } else if (_history.length >= _config.maxRoutes) {
       _history.removeAt(0);
     }
 
     _history.add(NavigationHistoryEntry(
       screenshot: bytes,
-      route: _activeRoute!,
+      route: route,
     ));
 
     _isLastOperationReplacement = false;
@@ -107,8 +103,9 @@ class NavigationHistoryService extends ChangeNotifier {
 
   /// Internal method to remove an entry when a route is popped.
   void handleRoutePopped(Route route) {
-    if (_history.isNotEmpty && _history.last.route == route) {
-      _history.removeLast();
+    final index = _history.indexWhere((e) => e.route == route);
+    if (index != -1) {
+      _history.removeAt(index);
       notifyListeners();
     }
   }

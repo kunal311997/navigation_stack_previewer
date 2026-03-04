@@ -7,6 +7,8 @@ import 'package:flutter/rendering.dart';
 import '../di/injection_container.dart';
 import '../services/navigation_history_service.dart';
 import '../utils/constants.dart';
+import '../utils/enums.dart';
+import '../utils/stack_preview_config.dart';
 import 'history_panel.dart';
 
 /// A global wrapper that enables navigation stack previewing for the entire app.
@@ -15,15 +17,13 @@ import 'history_panel.dart';
 class NavigationStackPreviewer extends StatefulWidget {
   final Widget child;
   final double panelHeight;
-  final Color primaryColor;
-  final Color backgroundColor;
+  final StackPreviewConfig config;
 
   const NavigationStackPreviewer({
     super.key,
     required this.child,
     this.panelHeight = AppConstants.defaultPanelHeight,
-    this.primaryColor = AppConstants.defaultPrimaryColor,
-    this.backgroundColor = Colors.white,
+    this.config = const StackPreviewConfig(),
   });
 
   @override
@@ -42,6 +42,9 @@ class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
   @override
   void initState() {
     super.initState();
+    // Update the service with the initial config
+    _navigationService.updateConfig(widget.config);
+
     _captureSubscription = _navigationService.captureRequests.listen((_) {
       _captureScreenshot();
     });
@@ -50,6 +53,14 @@ class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _captureScreenshot();
     });
+  }
+
+  @override
+  void didUpdateWidget(NavigationStackPreviewer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.config != widget.config) {
+      _navigationService.updateConfig(widget.config);
+    }
   }
 
   @override
@@ -69,7 +80,8 @@ class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
           as RenderRepaintBoundary?;
       if (boundary == null) return;
 
-      final image = await boundary.toImage(pixelRatio: 2.0);
+      final image =
+          await boundary.toImage(pixelRatio: widget.config.pixelRatio);
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) return;
 
@@ -91,6 +103,9 @@ class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isTop = widget.config.position == StackPreviewPosition.top;
+    final double offScreenPosition = -widget.panelHeight;
+
     return Stack(
       children: [
         RepaintBoundary(
@@ -101,11 +116,25 @@ class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
               _dragStartPosition = details.localPosition.dy;
             },
             onVerticalDragUpdate: (details) {
-              if (_dragStartPosition < AppConstants.defaultSwipeThreshold &&
-                  details.delta.dy > 5 &&
-                  !_isPanelOpen) {
-                _openPanel();
-                _dragStartPosition = double.infinity;
+              final double screenHeight = MediaQuery.of(context).size.height;
+
+              if (isTop) {
+                // Top swipe down logic
+                if (_dragStartPosition < AppConstants.defaultSwipeThreshold &&
+                    details.delta.dy > 5 &&
+                    !_isPanelOpen) {
+                  _openPanel();
+                  _dragStartPosition = double.infinity;
+                }
+              } else {
+                // Bottom swipe up logic
+                if (_dragStartPosition >
+                        screenHeight - AppConstants.defaultSwipeThreshold &&
+                    details.delta.dy < -5 &&
+                    !_isPanelOpen) {
+                  _openPanel();
+                  _dragStartPosition = double.negativeInfinity;
+                }
               }
             },
             child: widget.child,
@@ -117,9 +146,10 @@ class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
             child: Container(color: Colors.black26),
           ),
         AnimatedPositioned(
-          duration: AppConstants.defaultAnimationDuration,
-          curve: Curves.fastOutSlowIn,
-          top: _isPanelOpen ? 0 : -(widget.panelHeight + 50),
+          duration: widget.config.animationDuration,
+          curve: widget.config.animationCurve,
+          top: isTop ? (_isPanelOpen ? 0 : offScreenPosition) : null,
+          bottom: !isTop ? (_isPanelOpen ? 0 : offScreenPosition) : null,
           left: 0,
           right: 0,
           child: HistoryPanel(
@@ -127,8 +157,6 @@ class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
             onClose: _closePanel,
             onTap: _onTap,
             navigationService: _navigationService,
-            primaryColor: widget.primaryColor,
-            backgroundColor: widget.backgroundColor,
           ),
         ),
       ],

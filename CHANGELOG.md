@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 0.0.4
+- Added diverse layout options: Carousel and List.
+- Added support for multiple panel positions: Top and Bottom.
+- Added support for `animationDuration` and `animationCurve` for handling layout transitions.
+- Added `Preview` button to view enlarged screenshot.
+- Consolidated all settings into a unified `StackPreviewConfig` object for advanced customization.
+- Added configurable maximum stack size via `maxRoutes` (default: 5).
+- Added thumbnail resolution control via `pixelRatio` (default: 0.5).
+- Added primary and background colors for styling.
+
 ## 0.0.3
 - Simplified filtering logic by using `RouteSettings` instead of a global filter callback.
 - Updated `pubspec.yaml` with valid `repository` and `issue_tracker` links for pub.dev.

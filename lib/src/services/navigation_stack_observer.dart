@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../navigation_stack_previewer.dart';
+import 'navigation_history_service.dart';
 
 /// A NavigatorObserver that updates the [NavigationHistoryService] about navigation events.
 class NavigationStackObserver extends NavigatorObserver {

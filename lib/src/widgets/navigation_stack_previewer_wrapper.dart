@@ -152,11 +152,15 @@ class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
           bottom: !isTop ? (_isPanelOpen ? 0 : offScreenPosition) : null,
           left: 0,
           right: 0,
-          child: HistoryPanel(
-            height: widget.panelHeight,
-            onClose: _closePanel,
-            onTap: _onTap,
-            navigationService: _navigationService,
+          child: Navigator(
+            onGenerateRoute: (_) => MaterialPageRoute(
+              builder: (navContext) => HistoryPanel(
+                height: widget.panelHeight,
+                onClose: _closePanel,
+                onTap: _onTap,
+                navigationService: _navigationService,
+              ),
+            ),
           ),
         ),
       ],

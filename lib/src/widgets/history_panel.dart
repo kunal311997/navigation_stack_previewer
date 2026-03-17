@@ -28,7 +28,7 @@ class HistoryPanel extends StatelessWidget {
     final bool isTop = config.position == StackPreviewPosition.top;
 
     return Container(
-      height: height,
+      height: 400,
       decoration: BoxDecoration(
         color: config.backgroundColor,
         boxShadow: [
@@ -149,13 +149,15 @@ class HistoryPanel extends StatelessWidget {
       itemCount: entries.length,
       itemBuilder: (context, index) {
         final entry = entries[index];
+        final title = _getPageTitle(entry.route, index, entries.length);
         return HistoryCarouselItem(
           imageBytes: entry.screenshot,
-          title: _getPageTitle(entry.route, index, entries.length),
+          title: title,
           onTap: () => onTap(index),
           onRemove: () => navigationService.removeAt(index),
           isCurrent: index == 0,
           primaryColor: config.primaryColor,
+          backgroundColor: config.backgroundColor,
         );
       },
     );
@@ -169,9 +171,10 @@ class HistoryPanel extends StatelessWidget {
       itemCount: entries.length,
       itemBuilder: (context, index) {
         final entry = entries[index];
+        final title = _getPageTitle(entry.route, index, entries.length);
         return HistoryListItem(
           imageBytes: entry.screenshot,
-          title: _getPageTitle(entry.route, index, entries.length),
+          title: title,
           onTap: () => onTap(index),
           onRemove: () => navigationService.removeAt(index),
           isCurrent: index == 0,

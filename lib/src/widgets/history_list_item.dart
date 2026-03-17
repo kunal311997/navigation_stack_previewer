@@ -22,9 +22,53 @@ class HistoryListItem extends StatelessWidget {
     this.isCurrent = false,
   });
 
+  void _showEnlargedView(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        child: Stack(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(AppConstants.s12),
+              child: Image.memory(
+                imageBytes
+               ),
+            ),
+            Positioned(
+              top: AppConstants.s8,
+              right: AppConstants.s8,
+              child: IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                style: IconButton.styleFrom(backgroundColor: Colors.black54),
+              ),
+            ),
+            Positioned(
+              bottom: AppConstants.s20,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
+      color: Colors.transparent,
       child: Padding(
         padding: const EdgeInsets.only(bottom: AppConstants.s8),
         child: GestureDetector(
@@ -54,7 +98,7 @@ class HistoryListItem extends StatelessWidget {
                       Text(title),
                       if (isCurrent)
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.only(left: 8.0),
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: AppConstants.s8,
@@ -81,16 +125,17 @@ class HistoryListItem extends StatelessWidget {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (!isCurrent)
-                        GestureDetector(
-                            child: const Icon(Icons.remove_red_eye,
-                                color: Colors.black)),
+                      GestureDetector(
+                        onTap: () => _showEnlargedView(context),
+                        child: const Icon(Icons.remove_red_eye,
+                            color: Colors.black),
+                      ),
                       const SizedBox(width: AppConstants.s12),
                       if (!isCurrent)
                         GestureDetector(
-                            onTap: onRemove,
-                            child:
-                                const Icon(Icons.close, color: Colors.black)),
+                          onTap: onRemove,
+                          child: const Icon(Icons.close, color: Colors.black),
+                        ),
                     ],
                   ),
                 ),

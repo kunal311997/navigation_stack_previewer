@@ -2,19 +2,22 @@
 
 A Flutter package that provides a visual preview of your app's navigation stack. Simply swipe from the screen edge to see screenshots of your previous screens and navigate back instantly.
 
-# Screenshot 
-<img width="300" height="700" alt="Screenshot_20260302_225023" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260302_225023.png" />
+# Demo Video
+<img width="300" height="700" alt="Screenshot_20260326_105321" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screen_recording_20260326_105444.gif" />
 
-# Video 
-https://github.com/user-attachments/assets/33ed6b5d-d293-417c-a920-eeb8267d0092
+# Screenshots
+<img width="300" height="700" alt="Screenshot_20260302_225023" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260326_105242.png" />
+<img width="300" height="700" alt="Screenshot_20260326_105242" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260326_105321.png" />
+<img width="300" height="700" alt="Screenshot_20260326_105321" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260326_105342.png" />
 
 ## Features
 
 - **Visual History**: See real screenshots of previous screens in your navigation stack.
 - **Easy Navigation**: Tap on any screenshot or the "Preview" button to jump directly back to that screen.
-- **Multiple Layouts**: Choose between **Carousel**, **Grid**, and **Deck** layouts.
+- **Multiple Layouts**: Choose between **Carousel** and **List** layouts.
 - **Flexible Positioning**: Open the panel from the **Top** or **Bottom** of the screen.
 - **Auto-Detection**: Automatically detects `push`, `pushReplacement`, and `pop` operations.
+- **Enlarged Preview**: View high-resolution screenshots in a full-screen mode directly within the panel.
 - **Global Integration**: Set it up once and it works across your entire app.
 - **Customizable Appearance**: Change colors, titles, and animations via a unified config object.
 - **Filtering**: Hide specific screens from the previewer using `RouteSettings`.
@@ -67,6 +70,8 @@ class MyApp extends StatelessWidget {
             backgroundColor: Colors.white,
             maxRoutes: 15,
             pixelRatio: 0.5,
+            panelHeight: 400,
+            enlargedPanelHeight: 800,
           ),
           child: child!,
         );
@@ -81,6 +86,7 @@ class MyApp extends StatelessWidget {
 
 - **Swipe** from the configured edge (Top or Bottom) to open the panel.
 - **Tap** a screenshot to navigate back to it.
+- **Tap the Eye Icon** to see an enlarged full-screen view of the screenshot.
 - **Tap the X** to remove a specific screen from the stack.
 
 ## Advanced Customization
@@ -102,15 +108,17 @@ Navigator.of(context).push(
 
 ### Configuration Options (`StackPreviewConfig`)
 
-| Parameter | Type | Default | Description                           |
-|-----------|------|---------|---------------------------------------|
-| `layout` | `StackPreviewLayout` | `carousel` | `carousel` or `list`.                 |
-| `position` | `StackPreviewPosition` | `top` | `top` or `bottom`.                    |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `layout` | `StackPreviewLayout` | `carousel` | `carousel` or `list`. |
+| `position` | `StackPreviewPosition` | `top` | `top` or `bottom`. |
 | `primaryColor` | `Color` | `Color(0xFFc03463)` | Accent color for borders and buttons. |
-| `backgroundColor` | `Color` | `Colors.white` | Panel background color.               |
-| `maxRoutes` | `int` | `5` | Max screens to store in history.      |
-| `pixelRatio` | `double` | `0.5` | Resolution of captured screenshots.   |
-| `title` | `String` | `'Navigation Stack'` | Header text of the panel.             |
+| `backgroundColor` | `Color` | `Colors.white` | Panel background color. |
+| `panelHeight` | `double` | `400.0` | Initial height of the history panel. |
+| `enlargedPanelHeight` | `double` | `800.0` | Height when viewing an enlarged screenshot. |
+| `maxRoutes` | `int` | `5` | Max screens to store in history. |
+| `pixelRatio` | `double` | `0.5` | Resolution of captured screenshots. |
+| `title` | `String` | `'Navigation Stack'` | Header text of the panel. |
 
 ## Additional information
 

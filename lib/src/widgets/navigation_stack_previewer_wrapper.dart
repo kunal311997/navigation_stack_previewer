@@ -5,10 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 import '../di/injection_container.dart';
-import '../services/navigation_history_service.dart';
-import '../utils/constants.dart';
-import '../utils/enums.dart';
-import '../utils/stack_preview_config.dart';
+import '../services/services.dart';
+import '../utils/utils.dart';
 import 'history_panel.dart';
 
 /// A global wrapper that enables navigation stack previewing for the entire app.
@@ -16,13 +14,11 @@ import 'history_panel.dart';
 /// Place this in the `builder` property of your `MaterialApp`.
 class NavigationStackPreviewer extends StatefulWidget {
   final Widget child;
-  final double panelHeight;
   final StackPreviewConfig config;
 
   const NavigationStackPreviewer({
     super.key,
     required this.child,
-    this.panelHeight = AppConstants.defaultPanelHeight,
     this.config = const StackPreviewConfig(),
   });
 
@@ -96,15 +92,16 @@ class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
 
   void _closePanel() => setState(() => _isPanelOpen = false);
 
-  void _onTap(int index) {
+  void _onItemTap(int index) {
     _closePanel();
     _navigationService.jumpTo(index);
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool isTop = widget.config.position == StackPreviewPosition.top;
-    final double offScreenPosition = -widget.panelHeight;
+    final bool isConfigPositionTop =
+        widget.config.position == StackPreviewPosition.top;
+    final double offScreenPosition = -(widget.config.enlargedPanelHeight);
 
     return Stack(
       children: [
@@ -118,7 +115,7 @@ class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
             onVerticalDragUpdate: (details) {
               final double screenHeight = MediaQuery.of(context).size.height;
 
-              if (isTop) {
+              if (isConfigPositionTop) {
                 // Top swipe down logic
                 if (_dragStartPosition < AppConstants.defaultSwipeThreshold &&
                     details.delta.dy > 5 &&
@@ -148,19 +145,18 @@ class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
         AnimatedPositioned(
           duration: widget.config.animationDuration,
           curve: widget.config.animationCurve,
-          top: isTop ? (_isPanelOpen ? 0 : offScreenPosition) : null,
-          bottom: !isTop ? (_isPanelOpen ? 0 : offScreenPosition) : null,
+          top: isConfigPositionTop
+              ? (_isPanelOpen ? 0 : offScreenPosition)
+              : null,
+          bottom: !isConfigPositionTop
+              ? (_isPanelOpen ? 0 : offScreenPosition)
+              : null,
           left: 0,
           right: 0,
-          child: Navigator(
-            onGenerateRoute: (_) => MaterialPageRoute(
-              builder: (navContext) => HistoryPanel(
-                height: widget.panelHeight,
-                onClose: _closePanel,
-                onTap: _onTap,
-                navigationService: _navigationService,
-              ),
-            ),
+          child: HistoryPanel(
+            onClose: _closePanel,
+            onItemTap: _onItemTap,
+            navigationService: _navigationService,
           ),
         ),
       ],

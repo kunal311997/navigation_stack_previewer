@@ -6,7 +6,7 @@ import '../utils/constants.dart';
 
 class ScreenshotView extends StatelessWidget {
   final Uint8List imageBytes;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final VoidCallback? onRemove;
   final Color primaryColor;
   final String title;
@@ -15,7 +15,7 @@ class ScreenshotView extends StatelessWidget {
   const ScreenshotView({
     super.key,
     required this.imageBytes,
-    required this.onTap,
+    this.onTap,
     this.onRemove,
     required this.title,
     required this.primaryColor,

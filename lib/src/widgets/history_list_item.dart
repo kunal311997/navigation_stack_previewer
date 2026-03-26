@@ -1,69 +1,28 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
+import 'package:navigation_stack_previewer/navigation_stack_previewer.dart';
 
+import '../services/navigation_history_entry.dart';
 import '../utils/constants.dart';
 
 class HistoryListItem extends StatelessWidget {
-  final Uint8List imageBytes;
+  final bool isCurrent;
+  final String title;
+  final StackPreviewConfig config;
+  final NavigationHistoryEntry entry;
   final VoidCallback onTap;
   final VoidCallback onRemove;
-  final Color primaryColor;
-  final String title;
-  final bool isCurrent;
+  final VoidCallback onPreview;
 
   const HistoryListItem({
     super.key,
-    required this.imageBytes,
+    this.isCurrent = false,
+    required this.title,
+    required this.config,
+    required this.entry,
     required this.onTap,
     required this.onRemove,
-    required this.title,
-    required this.primaryColor,
-    this.isCurrent = false,
+    required this.onPreview,
   });
-
-  void _showEnlargedView(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        child: Stack(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(AppConstants.s12),
-              child: Image.memory(
-                imageBytes
-               ),
-            ),
-            Positioned(
-              top: AppConstants.s8,
-              right: AppConstants.s8,
-              child: IconButton(
-                onPressed: () => Navigator.of(context).pop(),
-                icon: const Icon(Icons.close, color: Colors.white, size: 30),
-                style: IconButton.styleFrom(backgroundColor: Colors.black54),
-              ),
-            ),
-            Positioned(
-              bottom: AppConstants.s20,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.black54,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +37,9 @@ class HistoryListItem extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.circular(AppConstants.s8),
               border: Border.all(
-                color: isCurrent ? primaryColor : primaryColor.withAlpha(50),
+                color: isCurrent
+                    ? config.primaryColor
+                    : config.primaryColor.withAlpha(50),
                 width: AppConstants.s2,
               ),
               boxShadow: [
@@ -105,7 +66,7 @@ class HistoryListItem extends StatelessWidget {
                               vertical: AppConstants.s4,
                             ),
                             decoration: BoxDecoration(
-                              color: primaryColor,
+                              color: config.primaryColor,
                               borderRadius:
                                   BorderRadius.circular(AppConstants.s8),
                             ),
@@ -126,7 +87,7 @@ class HistoryListItem extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       GestureDetector(
-                        onTap: () => _showEnlargedView(context),
+                        onTap: onPreview,
                         child: const Icon(Icons.remove_red_eye,
                             color: Colors.black),
                       ),

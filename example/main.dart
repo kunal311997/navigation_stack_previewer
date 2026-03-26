@@ -3,10 +3,7 @@ import 'package:navigation_stack_previewer/navigation_stack_previewer.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize the navigation stack previewer dependencies
   await initNavHistory();
-
   runApp(const MyApp());
 }
 
@@ -17,28 +14,23 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Navigation Stack Previewer Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      // 1. Add the NavigationStackObserver to track routes
       navigatorObservers: [
         NavigationStackObserver(),
       ],
-      // 2. Wrap the app with NavigationStackPreviewer to enable the swipe gesture
       builder: (context, child) {
         return NavigationStackPreviewer(
-          panelHeight: 400,
           config: const StackPreviewConfig(
+            title: 'App Navigation Stack',
+            panelHeight: 400,
+            enlargedPanelHeight: 800,
             layout: StackPreviewLayout.carousel,
             position: StackPreviewPosition.top,
-            primaryColor: Colors.deepPurple,
-            backgroundColor: Colors.white,
+            animationDuration: Duration(milliseconds: 400),
             animationCurve: Curves.fastOutSlowIn,
-            animationDuration: Duration(milliseconds: 500),
-            maxRoutes: 10,
+            primaryColor: Colors.red,
+            backgroundColor: Colors.white,
+            maxRoutes: 15,
             pixelRatio: 0.5,
-            title: 'App Navigation Stack',
           ),
           child: child!,
         );

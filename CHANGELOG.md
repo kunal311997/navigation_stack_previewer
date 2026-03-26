@@ -1,14 +1,19 @@
 # CHANGELOG
 
 ## 0.0.4
+- Added In-Panel Enlarged Preview mode.
+- Added support for dynamic panel height resizing via `enlargedPanelHeight`.
+- Improved route label cleaning to show friendly page names (e.g., "/user_profile" -> "User Profile").
 - Added diverse layout options: Carousel and List.
 - Added support for multiple panel positions: Top and Bottom.
-- Added support for `animationDuration` and `animationCurve` for handling layout transitions.
-- Added `Preview` button to view enlarged screenshot.
 - Consolidated all settings into a unified `StackPreviewConfig` object for advanced customization.
+- Improved memory management by cleaning up history when routes are removed.
+- Enhanced null-safety and defensive coding.
+- Added support for `animationDuration` and `animationCurve` for handling layout transitions.
 - Added configurable maximum stack size via `maxRoutes` (default: 5).
-- Added thumbnail resolution control via `pixelRatio` (default: 0.5).
+- Added thumbnail resolution control via `pixelRatio`
 - Added primary and background colors for styling.
+
 
 ## 0.0.3
 - Simplified filtering logic by using `RouteSettings` instead of a global filter callback.

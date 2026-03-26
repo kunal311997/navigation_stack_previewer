@@ -8,6 +8,12 @@ class StackPreviewConfig {
   /// The maximum number of routes to keep in the history.
   final int maxRoutes;
 
+  /// The height of the opened panel.
+  final double panelHeight;
+
+  /// The height of the enlarged panel.
+  final double enlargedPanelHeight;
+
   /// The pixel ratio to use for thumbnail capture.
   /// Lower values save memory.
   final double pixelRatio;
@@ -35,8 +41,10 @@ class StackPreviewConfig {
 
   /// Creates a new navigation stack previewer configuration.
   const StackPreviewConfig({
-    this.maxRoutes = 5,
-    this.pixelRatio = 0.5,
+    this.maxRoutes = AppConstants.defaultMaxRoutes,
+    this.panelHeight = AppConstants.defaultPanelHeight,
+    this.enlargedPanelHeight = AppConstants.defaultEnlargedPanelHeight,
+    this.pixelRatio = AppConstants.defaultPixelRatio,
     this.primaryColor = AppConstants.defaultPrimaryColor,
     this.backgroundColor = Colors.white,
     this.layout = StackPreviewLayout.carousel,

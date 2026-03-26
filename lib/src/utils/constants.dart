@@ -16,8 +16,11 @@ class AppConstants {
   static const String currentLabel = 'Current';
 
   // Behavior & Durations
-  static const double defaultSwipeThreshold = 100.0;
+  static const int defaultMaxRoutes = 5;
   static const double defaultPanelHeight = 400.0;
+  static const double defaultEnlargedPanelHeight = 800.0;
+  static const double defaultPixelRatio = 0.5;
+  static const double defaultSwipeThreshold = 100.0;
   static const Duration defaultAnimationDuration = Duration(milliseconds: 400);
   static const Duration captureDelay = Duration(milliseconds: 300);
 

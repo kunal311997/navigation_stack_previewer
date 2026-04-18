@@ -101,7 +101,7 @@ class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
   Widget build(BuildContext context) {
     final bool isConfigPositionTop =
         widget.config.position == StackPreviewPosition.top;
-    final double offScreenPosition = -(widget.config.enlargedPanelHeight);
+    final double offScreenPosition = -widget.config.enlargedPanelHeight;
 
     return Stack(
       children: [
@@ -138,9 +138,21 @@ class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
           ),
         ),
         if (_isPanelOpen)
-          GestureDetector(
-            onTap: _closePanel,
-            child: Container(color: Colors.black26),
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: _closePanel,
+              child: ClipRect(
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(
+                      sigmaX: AppConstants.backgroundBlurOffest,
+                      sigmaY: AppConstants.backgroundBlurOffest),
+                  child: Container(
+                    color: Colors.black
+                        .withOpacity(AppConstants.backgroundBlurOpacity),
+                  ),
+                ),
+              ),
+            ),
           ),
         AnimatedPositioned(
           duration: widget.config.animationDuration,
@@ -154,9 +166,8 @@ class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
           left: 0,
           right: 0,
           child: HistoryPanel(
-            onClose: _closePanel,
             onItemTap: _onItemTap,
-            navigationService: _navigationService,
+            onClose: _closePanel,
           ),
         ),
       ],

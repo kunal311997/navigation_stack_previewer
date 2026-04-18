@@ -24,152 +24,179 @@ class HistoryPanel extends StatefulWidget {
 }
 
 class _HistoryPanelState extends State<HistoryPanel> {
-  final NavigationHistoryService navigationService =
+  final NavigationHistoryService _navigationService =
       sl<NavigationHistoryService>();
-  bool isZoom = false;
-  String selectedImageTitle = '';
-  Uint8List? selectedImageBytes;
-  late double currentPanelHeight;
 
-  @override
-  void initState() {
-    currentPanelHeight = navigationService.config.panelHeight;
-    super.initState();
+  bool _isZoom = false;
+  String _selectedImageTitle = '';
+  Uint8List? _selectedImageBytes;
+
+  void _onPreview(NavigationHistoryEntry entry, String title) {
+    setState(() {
+      _isZoom = true;
+      _selectedImageTitle = title;
+      _selectedImageBytes = entry.screenshot;
+    });
   }
 
-  void _onPreview(NavigationHistoryEntry entry, int index, String title) {
+  void _closeZoom() {
     setState(() {
-      isZoom = true;
-      selectedImageTitle = title;
-      selectedImageBytes = entry.screenshot;
-      currentPanelHeight = navigationService.config.enlargedPanelHeight;
+      _isZoom = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final config = navigationService.config;
-    final bool isTop = config.position == StackPreviewPosition.top;
+    return ListenableBuilder(
+      listenable: _navigationService,
+      builder: (context, _) {
+        final config = _navigationService.config;
+        final bool isTop = config.position == StackPreviewPosition.top;
+        final double panelHeight =
+            _isZoom ? config.enlargedPanelHeight : config.panelHeight;
 
-    return Container(
-      height: currentPanelHeight,
-      decoration: BoxDecoration(
-        color: config.backgroundColor,
-        borderRadius: BorderRadius.vertical(
-          top: isTop ? Radius.zero : const Radius.circular(AppConstants.s24),
-          bottom: isTop ? const Radius.circular(AppConstants.s24) : Radius.zero,
-        ),
-      ),
-      child: SafeArea(
-        top: isTop,
-        bottom: !isTop,
-        child: (isZoom && selectedImageBytes != null)
-            ? ZoomView(
-                config: config,
-                title: selectedImageTitle,
-                imageBytes: selectedImageBytes!,
-                onClose: () {
-                  isZoom = false;
-                  currentPanelHeight = config.panelHeight;
-                  widget.onClose();
-                },
-                onPreviewClose: () {
-                  setState(() {
-                    isZoom = false;
-                    currentPanelHeight = config.panelHeight;
-                  });
-                })
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: AppConstants.s20,
-                        vertical: AppConstants.s8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          config.title,
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: config.primaryColor,
-                                  ),
-                        ),
-                        Container(
-                          height: AppConstants.s24,
-                          width: AppConstants.s24,
-                          decoration: BoxDecoration(
-                            color: config.primaryColor,
-                            shape: BoxShape.circle,
-                          ),
-                          child: GestureDetector(
-                            onTap: widget.onClose,
-                            child: Icon(Icons.close,
-                                size: AppConstants.s20,
-                                color: config.backgroundColor),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: ListenableBuilder(
-                      listenable: navigationService,
-                      builder: (context, _) {
-                        final entries = navigationService.historyEntries;
-                        final config = navigationService.config;
-
-                        if (entries.isEmpty) {
-                          return const Center(
-                              child: Text(AppConstants.noHistoryMessage));
-                        }
-
-                        final isCarousel =
-                            config.layout == StackPreviewLayout.carousel;
-
-                        return ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: AppConstants.s16),
-                          itemCount: entries.length,
-                          itemBuilder: (context, index) {
-                            final entry = entries[index];
-                            final title = getPageTitle(
-                                entry.route, index, entries.length);
-                            return isCarousel
-                                ? HistoryCarouselItem(
-                                    isCurrent: index == 0,
-                                    primaryColor: config.primaryColor,
-                                    imageBytes: entry.screenshot,
-                                    title: title,
-                                    onTap: () => widget.onItemTap(index),
-                                    onRemove: () =>
-                                        navigationService.removeAt(index),
-                                    onPreview: () =>
-                                        _onPreview(entry, index, title),
-                                  )
-                                : HistoryListItem(
-                                    isCurrent: index == 0,
-                                    config: config,
-                                    entry: entry,
-                                    title: title,
-                                    onTap: () => widget.onItemTap(index),
-                                    onRemove: () =>
-                                        navigationService.removeAt(index),
-                                    onPreview: () =>
-                                        _onPreview(entry, index, title),
-                                  );
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: AppConstants.s24),
-                ],
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOutCubic,
+          height: panelHeight,
+          decoration: BoxDecoration(
+            color: config.backgroundColor,
+            borderRadius: BorderRadius.vertical(
+              top:
+                  isTop ? Radius.zero : const Radius.circular(AppConstants.s24),
+              bottom:
+                  isTop ? const Radius.circular(AppConstants.s24) : Radius.zero,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 15,
+                offset: Offset(0, isTop ? 5 : -5),
               ),
+            ],
+          ),
+          child: SafeArea(
+            top: isTop,
+            bottom: !isTop,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(config),
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: ScaleTransition(
+                          scale: Tween<double>(begin: 0.95, end: 1.0)
+                              .animate(animation),
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: _isZoom && _selectedImageBytes != null
+                        ? ZoomView(
+                            key: const ValueKey('zoom_view'),
+                            config: config,
+                            title: _selectedImageTitle,
+                            imageBytes: _selectedImageBytes!,
+                            onClose: () {
+                              _closeZoom();
+                              widget.onClose();
+                            },
+                            onPreviewClose: _closeZoom,
+                          )
+                        : Padding(
+                            key: const ValueKey('history_list'),
+                            padding:
+                                const EdgeInsets.only(bottom: AppConstants.s16),
+                            child: _buildHistoryList(config),
+                          ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildHeader(StackPreviewConfig config) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppConstants.s20, vertical: AppConstants.s10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const SizedBox(width: AppConstants.s28),
+          Text(
+            config.title,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: config.primaryColor,
+                  fontFamily: AppConstants.fontFamily,
+                  package: AppConstants.packageName,
+                ),
+          ),
+          GestureDetector(
+            onTap: widget.onClose,
+            child: Container(
+              height: AppConstants.s28,
+              width: AppConstants.s28,
+              decoration: BoxDecoration(
+                color: config.primaryColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.close,
+                size: AppConstants.s20,
+                color: config.primaryColor,
+              ),
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildHistoryList(StackPreviewConfig config) {
+    final entries = _navigationService.historyEntries;
+    final isCarousel = config.layout == StackPreviewLayout.carousel;
+
+    return ListView.builder(
+      scrollDirection: isCarousel ? Axis.horizontal : Axis.vertical,
+      padding: const EdgeInsets.symmetric(horizontal: AppConstants.s16),
+      physics: const BouncingScrollPhysics(),
+      itemCount: entries.length,
+      itemBuilder: (context, index) {
+        final entry = entries[index];
+        final title = getPageTitle(entry.route, index, entries.length);
+
+        if (isCarousel) {
+          return HistoryCarouselItem(
+            isCurrent: index == 0,
+            primaryColor: config.primaryColor,
+            imageBytes: entry.screenshot,
+            title: title,
+            onTap: () => widget.onItemTap(index),
+            onRemove: () => _navigationService.removeAt(index),
+            onPreview: () => _onPreview(entry, title),
+          );
+        }
+
+        return HistoryListItem(
+          isCurrent: index == 0,
+          config: config,
+          entry: entry,
+          title: title,
+          onTap: () => widget.onItemTap(index),
+          onRemove: () => _navigationService.removeAt(index),
+          onPreview: () => _onPreview(entry, title),
+        );
+      },
     );
   }
 }

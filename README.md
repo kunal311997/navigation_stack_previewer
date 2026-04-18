@@ -1,127 +1,134 @@
 # Navigation Stack Previewer
 
-A Flutter package that provides a visual preview of your app's navigation stack. Simply swipe from the screen edge to see screenshots of your previous screens and navigate back instantly.
+[![pub package](https://img.shields.io/pub/v/navigation_stack_previewer.svg)](https://pub.dev/packages/navigation_stack_previewer)
+[![likes](https://img.shields.io/pub/likes/navigation_stack_previewer)](https://pub.dev/packages/navigation_stack_previewer/score)
+[![license](https://img.shields.io/github/license/kunal311997/navigation_stack_previewer)](https://github.com/kunal311997/navigation_stack_previewer/blob/master/LICENSE)
 
-# Demo Video
-<img width="300" height="700" alt="Screenshot_20260326_105321" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screen_recording_20260326_105444.gif" />
+A powerful visual debugging and navigation tool for Flutter developers. **Navigation Stack Previewer** allows you to see a real-time visual history of your app's navigation stack with screenshots, enabling instant "time-travel" back to any previous screen.
 
-# Screenshots
-<img width="300" height="700" alt="Screenshot_20260302_225023" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260326_105242.png" />
-<img width="300" height="700" alt="Screenshot_20260326_105242" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260326_105321.png" />
-<img width="300" height="700" alt="Screenshot_20260326_105321" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260326_105342.png" />
+## Why Navigation Stack Previewer?
 
-## Features
+Debugging complex navigation flows can be tedious. This package solves that by providing:
+- **Visual Context**: Don't just guess which screen is where in the stack—see it.
+- **Fast Testing**: Instantly jump back 5 screens without multiple back-button taps.
+- **Improved UX Design**: Review your navigation flow visually during development.
 
-- **Visual History**: See real screenshots of previous screens in your navigation stack.
-- **Easy Navigation**: Tap on any screenshot or the "Preview" button to jump directly back to that screen.
-- **Multiple Layouts**: Choose between **Carousel** and **List** layouts.
-- **Flexible Positioning**: Open the panel from the **Top** or **Bottom** of the screen.
-- **Auto-Detection**: Automatically detects `push`, `pushReplacement`, and `pop` operations.
-- **Enlarged Preview**: View high-resolution screenshots in a full-screen mode directly within the panel.
-- **Global Integration**: Set it up once and it works across your entire app.
-- **Customizable Appearance**: Change colors, titles, and animations via a unified config object.
-- **Filtering**: Hide specific screens from the previewer using `RouteSettings`.
+---
 
-## Getting started
+## 🎬 Demo
 
-Add the package to your `pubspec.yaml`:
+<p align="center">
+  <img width="300" alt="Navigation Stack Previewer Demo" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screen_recording_20260326_105444.gif" />
+</p>
 
+---
+
+## 📸 Screenshots
+
+<p align="center">
+  <img width="250" alt="Carousel Layout" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260326_105242.png" />
+  <img width="250" alt="List Layout" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260326_105321.png" />
+  <img width="250" alt="Enlarged Preview" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260326_105342.png" />
+</p>
+
+---
+
+## ✨ Features
+
+- 🖼️ **Visual History**: High-quality screenshots of every route in your stack.
+- 🚀 **Instant Navigation**: Tap any thumbnail to `popUntil` that specific route instantly.
+- 📱 **Flexible Layouts**: Switch between a sleek **Carousel** or a detailed **List** view.
+- ↕️ **Smart Positioning**: Pull from the **Top** or **Bottom** based on your app's UI.
+- 🤖 **Auto-Tracking**: Automatically detects `push`, `replace`, and `pop` events via `NavigatorObserver`.
+- 🔍 **Enlarged Mode**: Long-press or tap the zoom icon to inspect a screen in detail.
+- 🛠️ **Fully Customizable**: Control colors, animations, blur effects, and history depth.
+- 🛡️ **Privacy Control**: Easily exclude sensitive screens (like login or payment) from history.
+
+---
+
+## 🚀 Getting Started
+
+### 1. Add dependency
+Add this to your `pubspec.yaml`:
 ```yaml
 dependencies:
   navigation_stack_previewer: ^0.0.4
 ```
 
-## Usage
-
-### 1. Initialize the library
-
-Call `initNavHistory()` in your `main()` function:
-
+### 2. Initialize
+Call `initNavHistory()` in your `main()` before `runApp()`:
 ```dart
 import 'package:navigation_stack_previewer/navigation_stack_previewer.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initNavHistory();
   runApp(const MyApp());
 }
 ```
 
-### 2. Configure MaterialApp
-
-Add the `NavigationStackObserver` and wrap your app with `NavigationStackPreviewer`:
+### 3. Wrap your App
+Integrate the `NavigationStackObserver` and wrap your app with `NavigationStackPreviewer`:
 
 ```dart
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      navigatorObservers: [
-        NavigationStackObserver(),
-      ],
-      builder: (context, child) {
-        return NavigationStackPreviewer(
-          config: const StackPreviewConfig(
-            layout: StackPreviewLayout.carousel,
-            position: StackPreviewPosition.top,
-            animationDuration: Duration(milliseconds: 500),
-            animationCurve: Curves.fastOutSlowIn,
-            primaryColor: Colors.red,
-            backgroundColor: Colors.white,
-            maxRoutes: 15,
-            pixelRatio: 0.5,
-            panelHeight: 400,
-            enlargedPanelHeight: 800,
-          ),
-          child: child!,
-        );
-      },
-      home: const MyHomePage(),
+MaterialApp(
+  navigatorObservers: [
+    NavigationStackObserver(), // Required to track navigation
+  ],
+  builder: (context, child) {
+    return NavigationStackPreviewer(
+      config: const StackPreviewConfig(
+        title: "App History",
+        primaryColor: Colors.deepPurple,
+        layout: StackPreviewLayout.carousel,
+      ),
+      child: child!,
     );
-  }
-}
+  },
+  home: const HomePage(),
+)
 ```
 
-### 3. Swipe and Navigate!
+---
 
-- **Swipe** from the configured edge (Top or Bottom) to open the panel.
-- **Tap** a screenshot to navigate back to it.
-- **Tap the Eye Icon** to see an enlarged full-screen view of the screenshot.
-- **Tap the X** to remove a specific screen from the stack.
+## ⚙️ Configuration Options
 
-## Advanced Customization
+| Property | Default | Description |
+|----------|---------|-------------|
+| `layout` | `carousel` | Choose between `carousel` or `list`. |
+| `position` | `top` | Slide panel from `top` or `bottom`. |
+| `maxRoutes` | `10` | Maximum number of screenshots to store. |
+| `primaryColor` | `#c03463` | Accent color for the UI components. |
+| `backgroundColor` | `white` | Background color of the preview panel. |
+| `animationDuration` | `300ms` | Speed of the slide animation. |
+| `pixelRatio` | `0.5` | Resolution of screenshots (lower saves memory). |
 
-### Hiding Screens
+---
 
-Exclude specific screens by passing `preview: false` in `RouteSettings`:
+## 🔒 Excluding Sensitive Screens
+
+To prevent a screen from being captured in the history (e.g., for security or privacy), pass `preview: false` in `RouteSettings`:
 
 ```dart
-Navigator.of(context).push(
+Navigator.push(
+  context,
   MaterialPageRoute(
-    builder: (_) => const SecretPage(),
-    settings: const RouteSettings(
-      arguments: {'preview': false},
-    ),
+    settings: const RouteSettings(arguments: {'preview': false}),
+    builder: (_) => const SensitiveDataPage(),
   ),
 );
 ```
 
-### Configuration Options (`StackPreviewConfig`)
+---
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `layout` | `StackPreviewLayout` | `carousel` | `carousel` or `list`. |
-| `position` | `StackPreviewPosition` | `top` | `top` or `bottom`. |
-| `primaryColor` | `Color` | `Color(0xFFc03463)` | Accent color for borders and buttons. |
-| `backgroundColor` | `Color` | `Colors.white` | Panel background color. |
-| `panelHeight` | `double` | `400.0` | Initial height of the history panel. |
-| `enlargedPanelHeight` | `double` | `800.0` | Height when viewing an enlarged screenshot. |
-| `maxRoutes` | `int` | `5` | Max screens to store in history. |
-| `pixelRatio` | `double` | `0.5` | Resolution of captured screenshots. |
-| `title` | `String` | `'Navigation Stack'` | Header text of the panel. |
+## 💡 Pro Tips
+- **Memory Management**: Use a `pixelRatio` of `0.5` or lower for production debugging to keep memory usage low.
+- **Blur Effect**: You can customize the background blur intensity in `StackPreviewConfig`.
 
-## Additional information
+---
 
-This package uses `RepaintBoundary` to capture screenshots efficiently. It is designed for development and debugging purposes.
+## 🤝 Contributing
+Issues and pull requests are welcome! Feel free to report bugs or suggest new features on the [GitHub repository](https://github.com/kunal311997/navigation_stack_previewer).
 
-Contributions are welcome on the GitHub repository!
+## 📄 License
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/kunal311997/navigation_stack_previewer/blob/master/LICENSE) file for details.

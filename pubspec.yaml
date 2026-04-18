@@ -4,6 +4,21 @@ version: 0.0.4
 repository: https://github.com/kunal311997/navigation_stack_previewer.git
 issue_tracker: https://github.com/kunal311997/navigation_stack_previewer/issues
 
+topics:
+  - navigation
+  - debugging
+  - developer-tools
+  - screenshots
+  - ui-ux
+
+screenshots:
+  - description: 'Carousel layout showing navigation history with screenshots.'
+    path: Screenshot_20260326_105242.png
+  - description: 'List layout showing navigation history.'
+    path: Screenshot_20260326_105321.png
+  - description: 'Enlarged preview of a specific screen from the history.'
+    path: Screenshot_20260326_105342.png
+
 environment:
   sdk: ^3.5.3
   flutter: ">=1.17.0"

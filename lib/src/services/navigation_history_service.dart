@@ -20,7 +20,10 @@ class NavigationHistoryService extends ChangeNotifier {
 
   /// Update the configuration of the service.
   void updateConfig(StackPreviewConfig config) {
-    _config = config;
+    if (_config != config) {
+      _config = config;
+      notifyListeners();
+    }
   }
 
   final List<NavigationHistoryEntry> _history = [];
@@ -42,6 +45,8 @@ class NavigationHistoryService extends ChangeNotifier {
 
   /// Sets the active route that will be associated with the next screenshot.
   void setActiveRoute(Route? route, {bool isReplacement = false}) {
+    if (_activeRoute == route && !_isLastOperationReplacement) return;
+    
     _activeRoute = route;
     _isLastOperationReplacement = isReplacement;
     if (route != null) {
@@ -55,13 +60,17 @@ class NavigationHistoryService extends ChangeNotifier {
     if (route == null) return;
 
     // Check if we already have a screenshot for this specific route instance
-    if (_history.isNotEmpty && _history.last.route == route) {
+    // and if it's not a replacement operation
+    if (!_isLastOperationReplacement && _history.isNotEmpty && _history.last.route == route) {
       return;
     }
 
     if (_isLastOperationReplacement && _history.isNotEmpty) {
       _history.removeLast();
-    } else if (_history.length >= _config.maxRoutes) {
+    } 
+    
+    // Ensure we don't exceed maxRoutes
+    while (_history.length >= _config.maxRoutes) {
       _history.removeAt(0);
     }
 
@@ -82,6 +91,8 @@ class NavigationHistoryService extends ChangeNotifier {
     final NavigatorState? navigator = _history.last.route.navigator;
     if (navigator == null) return;
 
+    // Use popUntil for better efficiency if possible, 
+    // but since we want to pop 'index' times based on our history stack:
     for (int i = 0; i < index; i++) {
       if (navigator.canPop()) {
         navigator.pop();
@@ -112,6 +123,7 @@ class NavigationHistoryService extends ChangeNotifier {
 
   /// Clears all items from the navigation history.
   void clear() {
+    if (_history.isEmpty && _activeRoute == null) return;
     _history.clear();
     _activeRoute = null;
     _isLastOperationReplacement = false;

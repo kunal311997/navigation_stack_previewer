@@ -29,23 +29,22 @@ class NavigationStackPreviewer extends StatefulWidget {
 
 class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
   final GlobalKey _globalKey = GlobalKey();
+  final NavigationHistoryService _navigationService =
+      sl<NavigationHistoryService>();
+
   double _dragStartPosition = 0;
   bool _isPanelOpen = false;
   StreamSubscription? _captureSubscription;
-  final NavigationHistoryService _navigationService =
-      sl<NavigationHistoryService>();
 
   @override
   void initState() {
     super.initState();
-    // Update the service with the initial config
     _navigationService.updateConfig(widget.config);
 
     _captureSubscription = _navigationService.captureRequests.listen((_) {
       _captureScreenshot();
     });
 
-    // Initial capture for the home screen
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _captureScreenshot();
     });
@@ -67,41 +66,49 @@ class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
 
   Future<void> _captureScreenshot() async {
     try {
-      // Adding a small delay to ensure the screen content has fully settled/animated in
+      // Adding a small delay to ensure the screen content has fully settled
       await Future.delayed(AppConstants.captureDelay);
 
       if (!mounted) return;
 
       final boundary = _globalKey.currentContext?.findRenderObject()
           as RenderRepaintBoundary?;
+
       if (boundary == null) return;
+
+      // Check if it's currently painting to avoid errors
+      if (boundary.debugNeedsPaint) {
+        await Future.delayed(const Duration(milliseconds: 50));
+        return _captureScreenshot();
+      }
 
       final image =
           await boundary.toImage(pixelRatio: widget.config.pixelRatio);
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      if (byteData == null) return;
 
-      final bytes = byteData.buffer.asUint8List();
-      _navigationService.addScreenshot(bytes);
+      if (byteData != null) {
+        _navigationService.addScreenshot(byteData.buffer.asUint8List());
+      }
     } catch (e) {
-      debugPrint("Error capturing screenshot: $e");
+      debugPrint("NavigationStackPreviewer: Capture failed: $e");
     }
   }
 
-  void _openPanel() => setState(() => _isPanelOpen = true);
-
-  void _closePanel() => setState(() => _isPanelOpen = false);
+  void _togglePanel(bool open) {
+    if (_isPanelOpen == open) return;
+    setState(() => _isPanelOpen = open);
+  }
 
   void _onItemTap(int index) {
-    _closePanel();
+    _togglePanel(false);
     _navigationService.jumpTo(index);
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool isConfigPositionTop =
-        widget.config.position == StackPreviewPosition.top;
-    final double offScreenPosition = -widget.config.enlargedPanelHeight;
+    final config = widget.config;
+    final isTop = config.position == StackPreviewPosition.top;
+    final offScreenPosition = -config.enlargedPanelHeight;
 
     return Stack(
       children: [
@@ -109,68 +116,71 @@ class _NavigationStackPreviewerState extends State<NavigationStackPreviewer> {
           key: _globalKey,
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onVerticalDragStart: (details) {
-              _dragStartPosition = details.localPosition.dy;
-            },
-            onVerticalDragUpdate: (details) {
-              final double screenHeight = MediaQuery.of(context).size.height;
-
-              if (isConfigPositionTop) {
-                // Top swipe down logic
-                if (_dragStartPosition < AppConstants.defaultSwipeThreshold &&
-                    details.delta.dy > 5 &&
-                    !_isPanelOpen) {
-                  _openPanel();
-                  _dragStartPosition = double.infinity;
-                }
-              } else {
-                // Bottom swipe up logic
-                if (_dragStartPosition >
-                        screenHeight - AppConstants.defaultSwipeThreshold &&
-                    details.delta.dy < -5 &&
-                    !_isPanelOpen) {
-                  _openPanel();
-                  _dragStartPosition = double.negativeInfinity;
-                }
-              }
-            },
+            onVerticalDragStart: (details) =>
+                _dragStartPosition = details.localPosition.dy,
+            onVerticalDragUpdate: (details) =>
+                _handleDragUpdate(details, isTop),
             child: widget.child,
           ),
         ),
-        if (_isPanelOpen)
-          Positioned.fill(
-            child: GestureDetector(
-              onTap: _closePanel,
-              child: ClipRect(
-                child: BackdropFilter(
-                  filter: ui.ImageFilter.blur(
-                      sigmaX: AppConstants.backgroundBlurOffest,
-                      sigmaY: AppConstants.backgroundBlurOffest),
-                  child: Container(
-                    color: Colors.black
-                        .withOpacity(AppConstants.backgroundBlurOpacity),
-                  ),
-                ),
-              ),
+        _buildBackdrop(),
+        _buildAnimatedPanel(isTop, offScreenPosition),
+      ],
+    );
+  }
+
+  void _handleDragUpdate(DragUpdateDetails details, bool isTop) {
+    if (_isPanelOpen) return;
+
+    final screenHeight = MediaQuery.of(context).size.height;
+    const threshold = AppConstants.defaultSwipeThreshold;
+
+    if (isTop) {
+      if (_dragStartPosition < threshold && details.delta.dy > 5) {
+        _togglePanel(true);
+      }
+    } else {
+      if (_dragStartPosition > screenHeight - threshold &&
+          details.delta.dy < -5) {
+        _togglePanel(true);
+      }
+    }
+  }
+
+  Widget _buildBackdrop() {
+    if (!_isPanelOpen) return const SizedBox.shrink();
+
+    return Positioned.fill(
+      child: GestureDetector(
+        onTap: () => _togglePanel(false),
+        child: ClipRect(
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(
+              sigmaX: AppConstants.backgroundBlurOffest,
+              sigmaY: AppConstants.backgroundBlurOffest,
+            ),
+            child: Container(
+              color:
+                  Colors.black.withOpacity(AppConstants.backgroundBlurOpacity),
             ),
           ),
-        AnimatedPositioned(
-          duration: widget.config.animationDuration,
-          curve: widget.config.animationCurve,
-          top: isConfigPositionTop
-              ? (_isPanelOpen ? 0 : offScreenPosition)
-              : null,
-          bottom: !isConfigPositionTop
-              ? (_isPanelOpen ? 0 : offScreenPosition)
-              : null,
-          left: 0,
-          right: 0,
-          child: HistoryPanel(
-            onItemTap: _onItemTap,
-            onClose: _closePanel,
-          ),
         ),
-      ],
+      ),
+    );
+  }
+
+  Widget _buildAnimatedPanel(bool isTop, double offScreenPosition) {
+    return AnimatedPositioned(
+      duration: widget.config.animationDuration,
+      curve: widget.config.animationCurve,
+      top: isTop ? (_isPanelOpen ? 0 : offScreenPosition) : null,
+      bottom: !isTop ? (_isPanelOpen ? 0 : offScreenPosition) : null,
+      left: 0,
+      right: 0,
+      child: HistoryPanel(
+        onItemTap: _onItemTap,
+        onClose: () => _togglePanel(false),
+      ),
     );
   }
 }

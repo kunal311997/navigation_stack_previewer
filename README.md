@@ -18,7 +18,7 @@ Debugging complex navigation flows can be tedious. This package solves that by p
 ## 🎬 Demo
 
 <p align="center">
-  <img width="300" alt="Navigation Stack Previewer Demo" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screen_recording_20260326_105444.gif" />
+  <img width="300" alt="Navigation Stack Previewer Demo" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screen_recording_20260419_103343.gif" />
 </p>
 
 ---
@@ -26,9 +26,9 @@ Debugging complex navigation flows can be tedious. This package solves that by p
 ## 📸 Screenshots
 
 <p align="center">
+  <img width="250" alt="List Layout" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260419_103316.png" />
+  <img width="250" alt="Enlarged Preview" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260419_103325.png" />
   <img width="250" alt="Carousel Layout" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260326_105242.png" />
-  <img width="250" alt="List Layout" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260326_105321.png" />
-  <img width="250" alt="Enlarged Preview" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260326_105342.png" />
 </p>
 
 ---

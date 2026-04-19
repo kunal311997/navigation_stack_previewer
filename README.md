@@ -41,6 +41,8 @@ Debugging complex navigation flows can be tedious. This package solves that by p
 - ↕️ **Smart Positioning**: Pull from the **Top** or **Bottom** based on your app's UI.
 - 🤖 **Auto-Tracking**: Automatically detects `push`, `replace`, and `pop` events via `NavigatorObserver`.
 - 🔍 **Enlarged Mode**: Long-press or tap the zoom icon to inspect a screen in detail.
+- 🛡️ **Navigator 2.0 / Router API Support**: Track stacks managed by the declarative Router API.
+- 🔗 **Deep Linking Support**: Automatic detection and visualization of deep-linked routes.
 - 🛠️ **Fully Customizable**: Control colors, animations, blur effects, and history depth.
 - 🛡️ **Privacy Control**: Easily exclude sensitive screens (like login or payment) from history.
 
@@ -52,7 +54,7 @@ Debugging complex navigation flows can be tedious. This package solves that by p
 Add this to your `pubspec.yaml`:
 ```yaml
 dependencies:
-  navigation_stack_previewer: ^0.0.4
+  navigation_stack_previewer: ^0.0.5
 ```
 
 ### 2. Initialize

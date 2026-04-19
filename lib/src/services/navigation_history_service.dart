@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/stack_preview_config.dart';
+import '../utils/string_extensions.dart';
 import 'navigation_history_entry.dart';
 
 /// A service that manages the navigation history by storing screenshots and routes.
@@ -59,8 +60,6 @@ class NavigationHistoryService extends ChangeNotifier {
     final route = _activeRoute;
     if (route == null) return;
 
-    // Check if we already have a screenshot for this specific route instance
-    // and if it's not a replacement operation
     if (!_isLastOperationReplacement && _history.isNotEmpty && _history.last.route == route) {
       return;
     }
@@ -69,7 +68,6 @@ class NavigationHistoryService extends ChangeNotifier {
       _history.removeLast();
     } 
     
-    // Ensure we don't exceed maxRoutes
     while (_history.length >= _config.maxRoutes) {
       _history.removeAt(0);
     }
@@ -77,6 +75,7 @@ class NavigationHistoryService extends ChangeNotifier {
     _history.add(NavigationHistoryEntry(
       screenshot: bytes,
       route: route,
+      isDeepLink: isDeepLinkPath(route.settings.name),
     ));
 
     _isLastOperationReplacement = false;
@@ -84,15 +83,12 @@ class NavigationHistoryService extends ChangeNotifier {
   }
 
   /// Navigates back to a specific index in the history.
-  /// index 0 is current, index 1 is the previous screen, etc.
   void jumpTo(int index) {
     if (index <= 0 || index >= _history.length) return;
 
     final NavigatorState? navigator = _history.last.route.navigator;
     if (navigator == null) return;
 
-    // Use popUntil for better efficiency if possible, 
-    // but since we want to pop 'index' times based on our history stack:
     for (int i = 0; i < index; i++) {
       if (navigator.canPop()) {
         navigator.pop();
@@ -100,8 +96,7 @@ class NavigationHistoryService extends ChangeNotifier {
     }
   }
 
-  /// Removes a history item at the given index (relative to newest first list).
-  /// Also attempts to remove the associated route from the navigator.
+  /// Removes a history item at the given index.
   void removeAt(int index) {
     int absoluteIndex = _history.length - 1 - index;
     if (absoluteIndex >= 0 && absoluteIndex < _history.length) {
@@ -112,7 +107,7 @@ class NavigationHistoryService extends ChangeNotifier {
     }
   }
 
-  /// Internal method to remove an entry when a route is popped.
+  /// Internal method to remove an entry when a route is popped or removed (Navigator 2.0).
   void handleRoutePopped(Route route) {
     final index = _history.indexWhere((e) => e.route == route);
     if (index != -1) {

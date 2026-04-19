@@ -9,6 +9,13 @@ class NavigationHistoryEntry {
   /// The route associated with the screen.
   final Route route;
 
+  /// Whether this route was likely a deep link (has query params or complex path)
+  final bool isDeepLink;
+
   /// Creates a new navigation history entry.
-  NavigationHistoryEntry({required this.screenshot, required this.route});
+  NavigationHistoryEntry({
+    required this.screenshot,
+    required this.route,
+    this.isDeepLink = false,
+  });
 }

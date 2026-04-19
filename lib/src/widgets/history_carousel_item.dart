@@ -6,6 +6,7 @@ import '../utils/constants.dart';
 
 class HistoryCarouselItem extends StatelessWidget {
   final bool isCurrent;
+  final bool isDeepLink;
   final String title;
   final Uint8List imageBytes;
   final VoidCallback onTap;
@@ -16,6 +17,7 @@ class HistoryCarouselItem extends StatelessWidget {
   const HistoryCarouselItem({
     super.key,
     this.isCurrent = false,
+    this.isDeepLink = false,
     required this.title,
     required this.imageBytes,
     required this.onTap,
@@ -58,6 +60,7 @@ class HistoryCarouselItem extends StatelessWidget {
                   ),
                   _buildHeader(),
                   if (isCurrent) _buildCurrentBadge(),
+                  if (isDeepLink && !isCurrent) _buildDeepLinkBadge(),
                   _buildZoomButton(),
                 ],
               ),
@@ -138,6 +141,25 @@ class HistoryCarouselItem extends StatelessWidget {
             fontFamily: AppConstants.fontFamily,
             package: AppConstants.packageName,
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDeepLinkBadge() {
+    return Positioned(
+      bottom: AppConstants.s8,
+      left: AppConstants.s8,
+      child: Container(
+        padding: const EdgeInsets.all(AppConstants.s4),
+        decoration: BoxDecoration(
+          color: Colors.blueAccent.withOpacity(0.8),
+          borderRadius: BorderRadius.circular(AppConstants.s4),
+        ),
+        child: const Icon(
+          Icons.link,
+          size: 10,
+          color: Colors.white,
         ),
       ),
     );

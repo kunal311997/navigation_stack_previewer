@@ -166,6 +166,18 @@ class _HistoryPanelState extends State<HistoryPanel> {
     final entries = _navigationService.historyEntries;
     final isCarousel = config.layout == StackPreviewLayout.carousel;
 
+    if (entries.isEmpty) {
+      return const Center(
+        child: Text(
+          AppConstants.noHistoryMessage,
+          style: TextStyle(
+            fontFamily: AppConstants.fontFamily,
+            package: AppConstants.packageName,
+          ),
+        ),
+      );
+    }
+
     return ListView.builder(
       scrollDirection: isCarousel ? Axis.horizontal : Axis.vertical,
       padding: const EdgeInsets.symmetric(horizontal: AppConstants.s16),
@@ -178,6 +190,7 @@ class _HistoryPanelState extends State<HistoryPanel> {
         if (isCarousel) {
           return HistoryCarouselItem(
             isCurrent: index == 0,
+            isDeepLink: entry.isDeepLink,
             primaryColor: config.primaryColor,
             imageBytes: entry.screenshot,
             title: title,

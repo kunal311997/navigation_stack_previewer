@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 0.0.5
+- **Navigator 2.0 Support**: Improved tracking for declarative routing stacks.
+- **Deep Linking Support**: Added automatic detection and visualization of deep-linked routes.
+- **Enhanced Visuals**: Added "Link" badge to deep-link items in the carousel.
+- **Optimized UI**: Refined zoom-in animation with fixed header for smoother transitions.
+- **Improved Performance**: Efficiently handles `didRemove` events in the Router API.
+- **Better SEO**: Updated package metadata, topics, and documentation for pub.dev.
+- **Consolidated Constants**: Optimized default values for spacing, sizing, and animations.
+
 ## 0.0.4
 - Added In-Panel Enlarged Preview mode.
 - Added support for dynamic panel height resizing via `enlargedPanelHeight`.
@@ -13,7 +22,6 @@
 - Added configurable maximum stack size via `maxRoutes` (default: 5).
 - Added thumbnail resolution control via `pixelRatio`
 - Added primary and background colors for styling.
-
 
 ## 0.0.3
 - Simplified filtering logic by using `RouteSettings` instead of a global filter callback.

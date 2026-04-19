@@ -1,32 +1,32 @@
 import 'package:flutter/material.dart';
 
 String getPageTitle(Route route, int index, int total) {
-  final settings = route.settings;
-  String? name = settings.name;
+  final name = route.settings.name;
 
-  if (name == null || name.isEmpty) {
-    return 'Page ${total - index}';
+  if (name == null || name.isEmpty || name == '/') {
+    return name == '/' ? 'Home' : 'Page ${total - index}';
   }
 
-  if (name == '/') return 'Page 1';
-
-  String cleaned = name;
-  if (cleaned.startsWith('/')) {
-    cleaned = cleaned.substring(1);
+  // Handle common deep link patterns (query parameters)
+  String cleanName = name;
+  if (name.contains('?')) {
+    cleanName = name.split('?').first;
   }
 
-  if (cleaned.contains('/')) {
-    cleaned = cleaned.split('/').last;
-  }
+  // Extract last segment and clean up
+  return cleanName
+      .split('/')
+      .last
+      .replaceAll(RegExp(r'[-_]'), ' ')
+      .split(' ')
+      .where((s) => s.isNotEmpty)
+      .map((s) => s[0].toUpperCase() + s.substring(1))
+      .join(' ');
+}
 
-  cleaned = cleaned.replaceAll('_', ' ').replaceAll('-', ' ');
-
-  if (cleaned.isNotEmpty) {
-    return cleaned.split(' ').map((word) {
-      if (word.isEmpty) return word;
-      return word[0].toUpperCase() + word.substring(1);
-    }).join(' ');
-  }
-
-  return 'Page ${total - index}';
+/// Checks if a route name represents a deep link structure
+bool isDeepLinkPath(String? name) {
+  if (name == null) return false;
+  // Common deep link indicators: query params or nested paths
+  return name.contains('?') || (name.contains('/') && name.length > 1);
 }

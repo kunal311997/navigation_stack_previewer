@@ -55,11 +55,16 @@ class ZoomView extends StatelessWidget {
         Positioned(
           bottom: AppConstants.s24,
           right: AppConstants.s24,
-          child: FloatingActionButton.small(
-            onPressed: onPreviewClose,
-            backgroundColor: config.primaryColor,
-            elevation: 4,
-            child: Icon(Icons.zoom_in_map, color: config.backgroundColor),
+          child: GestureDetector(
+            onTap: onPreviewClose,
+            child: Container(
+              padding: const EdgeInsets.all(AppConstants.s8),
+              child: const Icon(
+                Icons.zoom_in_map,
+                size: AppConstants.s24,
+                color: Colors.black,
+              ),
+            ),
           ),
         )
       ],

@@ -26,9 +26,9 @@ Debugging complex navigation flows can be tedious. This package solves that by p
 ## 📸 Screenshots
 
 <p align="center">
-  <img width="250" alt="List Layout" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260419_103316.png" />
+  <img width="250" alt="Carousel Layout" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260419_103316.png" />
   <img width="250" alt="Enlarged Preview" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260419_103325.png" />
-  <img width="250" alt="Carousel Layout" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260326_105242.png" />
+  <img width="250" alt="List Layout" src="https://raw.githubusercontent.com/kunal311997/navigation_stack_previewer/master/Screenshot_20260419_180223.png" />
 </p>
 
 ---

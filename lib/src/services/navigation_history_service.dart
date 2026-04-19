@@ -46,7 +46,7 @@ class NavigationHistoryService extends ChangeNotifier {
 
   /// Sets the active route that will be associated with the next screenshot.
   void setActiveRoute(Route? route, {bool isReplacement = false}) {
-    if (_activeRoute == route && !_isLastOperationReplacement) return;
+    if (_activeRoute == route && _isLastOperationReplacement == isReplacement) return;
     
     _activeRoute = route;
     _isLastOperationReplacement = isReplacement;
@@ -60,7 +60,8 @@ class NavigationHistoryService extends ChangeNotifier {
     final route = _activeRoute;
     if (route == null) return;
 
-    if (!_isLastOperationReplacement && _history.isNotEmpty && _history.last.route == route) {
+    // Check if we already have a screenshot for this specific route instance
+    if (_history.isNotEmpty && _history.last.route == route) {
       return;
     }
 
@@ -101,9 +102,16 @@ class NavigationHistoryService extends ChangeNotifier {
     int absoluteIndex = _history.length - 1 - index;
     if (absoluteIndex >= 0 && absoluteIndex < _history.length) {
       final entry = _history[absoluteIndex];
-      entry.route.navigator?.removeRoute(entry.route);
-      _history.removeAt(absoluteIndex);
-      notifyListeners();
+      final route = entry.route;
+
+      if (route.navigator != null) {
+        // Navigator will notify the observer, which calls handleRoutePopped.
+        // We don't remove it manually here to avoid double removal.
+        route.navigator!.removeRoute(route);
+      } else {
+        _history.removeAt(absoluteIndex);
+        notifyListeners();
+      }
     }
   }
 

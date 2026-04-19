@@ -26,36 +26,39 @@ class HistoryListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppConstants.s12),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(AppConstants.s12),
-            border: Border.all(
-              color: isCurrent
-                  ? config.primaryColor
-                  : config.primaryColor.withOpacity(0.1),
-              width: AppConstants.s2,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 8,
-                offset: const Offset(2, 2),
+    return Material(
+      color: Colors.transparent,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: AppConstants.s12),
+        child: GestureDetector(
+          onTap: onTap,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(AppConstants.s12),
+              border: Border.all(
+                color: isCurrent
+                    ? config.primaryColor
+                    : config.primaryColor.withOpacity(0.1),
+                width: AppConstants.s2,
               ),
-            ],
-          ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: AppConstants.s16,
-              vertical: AppConstants.s4,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(2, 2),
+                ),
+              ],
             ),
-            leading: _buildThumbnail(),
-            title: _buildTitle(),
-            trailing: _buildActions(),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: AppConstants.s16,
+                vertical: AppConstants.s4,
+              ),
+              leading: _buildThumbnail(),
+              title: _buildTitle(),
+              trailing: _buildActions(),
+            ),
           ),
         ),
       ),
